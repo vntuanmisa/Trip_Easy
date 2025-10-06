@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 
 // Import i18n configuration
 import './i18n';
@@ -16,7 +15,6 @@ import NotFound from './pages/NotFound';
 
 // Import components
 import Layout from './components/Layout';
-import LoadingSpinner from './components/LoadingSpinner';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -29,8 +27,6 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const { i18n } = useTranslation();
-
   return (
     <QueryClientProvider client={queryClient}>
       <Router>

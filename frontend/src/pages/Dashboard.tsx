@@ -12,7 +12,6 @@ import { useQuery } from '@tanstack/react-query';
 import { TripService } from '../services/tripService';
 import { Trip } from '../types';
 import { formatDate, getRelativeDate } from '../utils/dateUtils';
-import { formatCurrency } from '../utils/currencyUtils';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Dashboard: React.FC = () => {

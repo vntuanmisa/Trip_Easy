@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -24,7 +24,6 @@ const CreateTrip: React.FC = () => {
     handleSubmit,
     formState: { errors },
     watch,
-    setValue,
   } = useForm<TripCreate>({
     defaultValues: {
       currency: CurrencyEnum.VND,
