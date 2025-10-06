@@ -3,8 +3,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
 import os
+import tempfile
 
-# Create SSL certificate file
+# Create SSL certificate file in temp directory
 ca_cert_content = """-----BEGIN CERTIFICATE-----
 MIIEUDCCArigAwIBAgIUEZaAWNO0/ni5NsqJdJCI2lY0n/IwDQYJKoZIhvcNAQEM
 BQAwQDE+MDwGA1UEAww1ZmMzY2MxYTQtY2JhYi00MTgzLTg4ZWItMjc3MGMyYzkw
@@ -32,14 +33,15 @@ t9I1+SV15lgSs2/4cP3AdB3Q+UN5WdQO/DsBsrlkbC98IIJOKIaU8QTDtNCdPOxV
 domtlw==
 -----END CERTIFICATE-----"""
 
-# Write CA certificate to file
-ca_cert_path = os.path.join(os.path.dirname(__file__), "ca-cert.pem")
-with open(ca_cert_path, "w") as f:
-    f.write(ca_cert_content)
+# Create temp file for CA certificate
+temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.pem')
+temp_file.write(ca_cert_content)
+temp_file.close()
+ca_cert_path = temp_file.name
 
 # Database connection
 engine = create_engine(
-    settings.database_url,
+    settings.database_url.replace("?ssl_ca=ca-cert.pem", f"?ssl_ca={ca_cert_path}"),
     pool_pre_ping=True,
     pool_recycle=300,
     connect_args={

@@ -18,8 +18,12 @@ class Settings(BaseSettings):
     # External APIs
     google_maps_api_key: str = ""
     
-    # CORS
-    cors_origins: List[str] = ["http://localhost:3000"]
+    # CORS - Handle as string and split
+    cors_origins: str = "http://localhost:3000"
+    
+    @property
+    def cors_origins_list(self) -> List[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",")]
     
     @property
     def database_url(self) -> str:

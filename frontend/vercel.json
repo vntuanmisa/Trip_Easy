@@ -4,7 +4,10 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "config": { 
+        "distDir": "build",
+        "installCommand": "npm install --legacy-peer-deps"
+      }
     }
   ],
   "routes": [
@@ -18,6 +21,9 @@
     }
   ],
   "env": {
-    "REACT_APP_API_URL": "@react_app_api_url"
+    "REACT_APP_API_URL": "https://tripeasy-api.vercel.app",
+    "REACT_APP_GOOGLE_MAPS_API_KEY": "your-google-maps-api-key-here",
+    "REACT_APP_APP_NAME": "TripEasy",
+    "REACT_APP_VERSION": "1.0.0"
   }
 }
