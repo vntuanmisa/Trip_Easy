@@ -16,6 +16,7 @@ try:
     logger.info("Database tables created successfully")
 except Exception as e:
     logger.error(f"Error creating database tables: {e}")
+    # Continue anyway, tables might already exist
 
 # Create FastAPI app
 app = FastAPI(
