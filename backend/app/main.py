@@ -5,17 +5,42 @@ from .core.config import settings
 from .core.database import engine, Base
 from .api import trips, members, activities, expenses
 import logging
+from sqlalchemy import text
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Create database tables
+# Create database tables & ensure required columns exist (idempotent)
 try:
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created successfully")
+
+    # Ensure required columns exist on trips (production DB may be legacy)
+    ensure_trip_columns_sql = [
+        # Using IF NOT EXISTS keeps this idempotent on MySQL 8+
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS description TEXT",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS start_date DATETIME NOT NULL",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS end_date DATETIME NOT NULL",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS currency ENUM('VND','USD','EUR','JPY','KRW','THB') DEFAULT 'VND'",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS child_factor DECIMAL(3,2) DEFAULT 0.5",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS rounding_rule INT DEFAULT 1000",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS invite_code VARCHAR(10)",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS created_at DATETIME DEFAULT CURRENT_TIMESTAMP",
+        "ALTER TABLE trips ADD COLUMN IF NOT EXISTS updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+        # Basic indexes if missing (ignore errors if exist)
+        "CREATE INDEX IF NOT EXISTS idx_invite_code ON trips(invite_code)",
+    ]
+    with engine.begin() as conn:
+        for stmt in ensure_trip_columns_sql:
+            try:
+                conn.execute(text(stmt))
+            except Exception as sub_e:
+                # Some MySQL variants may not support IF NOT EXISTS on certain clauses; ignore if already exists
+                logger.warning(f"Schema ensure step ignored/failed: {stmt} -> {sub_e}")
+    logger.info("Schema ensure: trips columns verified")
 except Exception as e:
-    logger.error(f"Error creating database tables: {e}")
+    logger.error(f"Error creating/ensuring database tables: {e}")
     # Continue anyway, tables might already exist
 
 # Create FastAPI app
