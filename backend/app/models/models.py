@@ -25,7 +25,7 @@ class Trip(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
-    description = Column(Text, nullable=True)
+    # description = Column(Text, nullable=True)  # Temporarily disabled due to missing column in production DB
     destination = Column(String(255), nullable=False)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)

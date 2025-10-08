@@ -12,7 +12,7 @@ class TripService:
         """Tạo chuyến đi mới"""
         db_trip = TripModel(
             name=trip.name,
-            description=trip.description,
+            # description=trip.description,  # Temporarily disabled due to missing column in production DB
             destination=trip.destination,
             start_date=trip.start_date,
             end_date=trip.end_date,
