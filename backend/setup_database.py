@@ -24,14 +24,16 @@ def create_database_tables():
         print(f"Port: {settings.database_port}")
         print(f"Database: {settings.database_name}")
         
-        # Tạo engine
+        # Tạo engine với SSL configuration tương tự như trong database.py
         engine = create_engine(
-            settings.database_url.replace("?ssl_ca=ca-cert.pem", f"?ssl_ca={ca_cert_path}"),
+            f"mysql+pymysql://{settings.database_user}:{settings.database_password}@{settings.database_host}:{settings.database_port}/{settings.database_name}",
             pool_pre_ping=True,
             pool_recycle=300,
             connect_args={
-                "ssl_disabled": False,
-                "ssl_ca": ca_cert_path
+                "ssl_ca": ca_cert_path,
+                "ssl_verify_cert": True,
+                "ssl_verify_identity": False,
+                "charset": "utf8mb4"
             }
         )
         

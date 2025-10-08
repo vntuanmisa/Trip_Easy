@@ -39,14 +39,16 @@ temp_file.write(ca_cert_content)
 temp_file.close()
 ca_cert_path = temp_file.name
 
-# Database connection
+# Database connection with SSL REQUIRED mode
 engine = create_engine(
-    settings.database_url.replace("?ssl_ca=ca-cert.pem", f"?ssl_ca={ca_cert_path}"),
+    f"mysql+pymysql://{settings.database_user}:{settings.database_password}@{settings.database_host}:{settings.database_port}/{settings.database_name}",
     pool_pre_ping=True,
     pool_recycle=300,
     connect_args={
-        "ssl_disabled": False,
-        "ssl_ca": ca_cert_path
+        "ssl_ca": ca_cert_path,
+        "ssl_verify_cert": True,
+        "ssl_verify_identity": False,  # Aiven Cloud may use different certificate identity
+        "charset": "utf8mb4"
     }
 )
 

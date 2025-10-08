@@ -25,10 +25,6 @@ class Settings(BaseSettings):
     def cors_origins_list(self) -> List[str]:
         return [origin.strip() for origin in self.cors_origins.split(",")]
     
-    @property
-    def database_url(self) -> str:
-        return f"mysql+pymysql://{self.database_user}:{self.database_password}@{self.database_host}:{self.database_port}/{self.database_name}?ssl_ca=ca-cert.pem"
-    
     class Config:
         env_file = ".env"
         case_sensitive = False
