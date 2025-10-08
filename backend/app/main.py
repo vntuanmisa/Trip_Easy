@@ -63,21 +63,52 @@ async def root():
 @app.get("/health")
 async def health_check():
     try:
-        # Test database connection
+        # Test basic database connection without querying specific tables
         from .core.database import SessionLocal
         db = SessionLocal()
-        db.execute("SELECT 1")
+        result = db.execute("SELECT 1 as test").fetchone()
         db.close()
         return {
             "status": "healthy",
             "database": "connected",
+            "test_result": result[0] if result else None,
             "message": "Hệ thống hoạt động bình thường"
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(
             status_code=503,
-            detail="Hệ thống gặp sự cố"
+            detail=f"Hệ thống gặp sự cố: {str(e)}"
+        )
+
+@app.get("/db-info")
+async def database_info():
+    """Kiểm tra thông tin database và tables"""
+    try:
+        from .core.database import SessionLocal
+        db = SessionLocal()
+        
+        # Check if trips table exists
+        result = db.execute("SHOW TABLES LIKE 'trips'").fetchone()
+        trips_exists = result is not None
+        
+        tables_info = {}
+        if trips_exists:
+            # Get trips table structure
+            columns = db.execute("DESCRIBE trips").fetchall()
+            tables_info["trips"] = [{"name": col[0], "type": col[1], "null": col[2], "key": col[3]} for col in columns]
+        
+        db.close()
+        return {
+            "database": "connected",
+            "trips_table_exists": trips_exists,
+            "tables_info": tables_info
+        }
+    except Exception as e:
+        logger.error(f"Database info check failed: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail=f"Không thể lấy thông tin database: {str(e)}"
         )
 
 # Include routers
