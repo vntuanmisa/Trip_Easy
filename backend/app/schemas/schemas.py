@@ -7,7 +7,7 @@ from ..models.models import CurrencyEnum, ExpenseCategoryEnum
 # Base schemas
 class TripBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    # description: Optional[str] = None  # Temporarily disabled due to missing column in production DB
+    description: Optional[str] = None  # Re-enabled after database schema setup
     destination: str = Field(..., min_length=1, max_length=255)
     start_date: datetime
     end_date: datetime
@@ -20,7 +20,7 @@ class TripCreate(TripBase):
 
 class TripUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    # description: Optional[str] = None  # Temporarily disabled due to missing column in production DB
+    description: Optional[str] = None  # Re-enabled after database schema setup
     destination: Optional[str] = Field(None, min_length=1, max_length=255)
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
