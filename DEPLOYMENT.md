@@ -57,13 +57,13 @@ git push origin main
 3. **Mapping URL cố định:**
    - Vào Vercel Dashboard
    - Settings > Domains
-   - Thêm custom domain: `tripeasy-backend.vercel.app`
+   - Thêm custom domain: `tripeasy-backend.vercel.app` (hoặc domain riêng)
 
 #### Frontend Deployment
 1. **Cấu hình Environment Variables:**
    ```
    REACT_APP_API_URL=https://tripeasy-backend.vercel.app
-   REACT_APP_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+   REACT_APP_GOOGLE_MAPS_API_KEY=<set-on-vercel-dashboard>
    ```
 
 2. **Deploy Frontend:**
@@ -74,11 +74,32 @@ git push origin main
    ```
 
 3. **Mapping URL cố định:**
-   - Custom domain: `tripeasy-frontend.vercel.app`
+   - Custom domain: `tripeasy-frontend.vercel.app` (hoặc domain riêng)
+
+### Tự động commit & redeploy (script)
+
+Có thể dùng script PowerShell để tự động hoá commit + deploy + alias:
+
+```powershell
+# Yêu cầu: đã cài vercel CLI hoặc dùng npx, đã có $env:VERCEL_TOKEN
+# Tham số alias tuỳ chỉnh theo domain cố định của bạn
+
+powershell -ExecutionPolicy Bypass -File .\scripts\redeploy.ps1 `
+  -CommitMessage "chore: redeploy" `
+  -BackendDir "backend" `
+  -FrontendDir "frontend" `
+  -BackendAlias "tripeasy-backend.vercel.app" `
+  -FrontendAlias "tripeasy-frontend.vercel.app"
+```
+
+Script sẽ:
+- Tự động `git add`, `commit`, `push`
+- Kéo env từ Vercel `env pull`, build nếu cần, `vercel deploy --prod`
+- Mapping alias cố định cho cả backend và frontend
 
 ### Checklist Sau Deploy
-- [ ] Kiểm tra backend API hoạt động: `https://tripeasy-backend.vercel.app/health`
-- [ ] Kiểm tra frontend load được: `https://tripeasy-frontend.vercel.app`
+- [ ] Kiểm tra backend API hoạt động: `https://<backend-domain>/health`
+- [ ] Kiểm tra frontend load được: `https://<frontend-domain>`
 - [ ] Test kết nối giữa frontend và backend
 - [ ] Kiểm tra database connection
 - [ ] Test các tính năng chính
