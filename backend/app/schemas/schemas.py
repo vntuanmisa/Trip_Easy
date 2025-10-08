@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
@@ -40,7 +40,7 @@ class Trip(TripBase):
 # Trip Member schemas
 class TripMemberBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None  # Changed from EmailStr to str
     factor: Decimal = Field(default=Decimal("1.0"), ge=0, le=5)
 
 class TripMemberCreate(TripMemberBase):
@@ -48,7 +48,7 @@ class TripMemberCreate(TripMemberBase):
 
 class TripMemberUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None  # Changed from EmailStr to str
     factor: Optional[Decimal] = Field(None, ge=0, le=5)
 
 class TripMember(TripMemberBase):
@@ -128,7 +128,7 @@ class Expense(ExpenseBase):
 # Expense Category schemas
 class ExpenseCategoryBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    color: str = Field(default="#6B7280", regex=r"^#[0-9A-Fa-f]{6}$")
+    color: str = Field(default="#6B7280", pattern=r"^#[0-9A-Fa-f]{6}$")
 
 class ExpenseCategoryCreate(ExpenseCategoryBase):
     pass

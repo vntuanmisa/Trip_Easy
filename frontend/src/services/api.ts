@@ -1,7 +1,13 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ApiError } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const runtimeDefault = (typeof window !== 'undefined' && window.location.hostname !== 'localhost')
+  ? 'https://tripeasyapi-mauve.vercel.app'
+  : 'http://localhost:8000';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || runtimeDefault;
+
+console.info('[TripEasy] API_BASE_URL =', API_BASE_URL);
 
 class ApiClient {
   private client: AxiosInstance;
@@ -21,7 +27,7 @@ class ApiClient {
         // Add auth token if available
         const token = localStorage.getItem('auth_token');
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+          (config.headers as any).Authorization = `Bearer ${token}`;
         }
         return config;
       },
