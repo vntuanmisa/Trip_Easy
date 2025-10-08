@@ -15,7 +15,7 @@ export class TripService {
   }
 
   static async getTrips(skip = 0, limit = 100): Promise<Trip[]> {
-    return apiClient.get<Trip[]>(this.BASE_URL, { skip, limit });
+    return apiClient.get<Trip[]>(`${this.BASE_URL}/`, { skip, limit });
   }
 
   static async getTrip(tripId: number): Promise<TripWithDetails> {

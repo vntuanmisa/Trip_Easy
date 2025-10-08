@@ -15,6 +15,7 @@ def generate_invite_code() -> str:
     """Tạo mã mời ngẫu nhiên"""
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
+@router.post("", response_model=Trip, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 @router.post("/", response_model=Trip, status_code=status.HTTP_201_CREATED)
 async def create_trip(trip: TripCreate, db: Session = Depends(get_db)):
     """Tạo chuyến đi mới"""
@@ -33,6 +34,7 @@ async def create_trip(trip: TripCreate, db: Session = Depends(get_db)):
             detail=f"Không thể tạo chuyến đi: {str(e)}"
         )
 
+@router.get("", response_model=List[Trip], include_in_schema=False)
 @router.get("/", response_model=List[Trip])
 async def get_trips(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Lấy danh sách chuyến đi"""
