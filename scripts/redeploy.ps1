@@ -19,10 +19,8 @@ $ErrorActionPreference = "Stop"
 
 Write-Info "Starting redeploy pipeline..."
 
-if (-not $env:VERCEL_TOKEN) {
-  Write-Error "VERCEL_TOKEN environment variable is required. Set it before running this script."
-  exit 1
-}
+$hasToken = $false
+if ($env:VERCEL_TOKEN -and -not [string]::IsNullOrWhiteSpace($env:VERCEL_TOKEN)) { $hasToken = $true }
 
 $useVercelCmd = ""
 if (Require-Command "vercel") {
@@ -31,6 +29,18 @@ if (Require-Command "vercel") {
   $useVercelCmd = "npx vercel@latest"
 } else {
   Write-Error "Neither 'vercel' nor 'npx' is available. Please install Node.js (which provides npx) or the Vercel CLI."
+  exit 1
+}
+
+# Validate authentication: either token provided or CLI already logged in
+$isLoggedIn = $false
+try {
+  $whoami = & $useVercelCmd whoami 2>$null
+  if ($LASTEXITCODE -eq 0 -and $whoami) { $isLoggedIn = $true }
+} catch { $isLoggedIn = $false }
+
+if (-not $hasToken -and -not $isLoggedIn) {
+  Write-Error "Vercel authentication required. Set VERCEL_TOKEN or login via 'vercel login' before running this script."
   exit 1
 }
 
@@ -48,7 +58,11 @@ function Deploy-With-Vercel($projectDir, $alias) {
   Push-Location $projectDir
   try {
     Write-Info "Deploying project at '$projectDir'..."
-    & $useVercelCmd env pull .env.local --yes --token $env:VERCEL_TOKEN | Out-Null
+    if ($hasToken) {
+      & $useVercelCmd env pull .env.local --yes --token $env:VERCEL_TOKEN | Out-Null
+    } else {
+      & $useVercelCmd env pull .env.local --yes | Out-Null
+    }
 
     if (Test-Path package.json) {
       if (Test-Path package-lock.json) {
@@ -64,7 +78,11 @@ function Deploy-With-Vercel($projectDir, $alias) {
       }
     }
 
-    $deployOutput = & $useVercelCmd deploy --prod --yes --token $env:VERCEL_TOKEN 2>&1
+    if ($hasToken) {
+      $deployOutput = & $useVercelCmd deploy --prod --yes --token $env:VERCEL_TOKEN 2>&1
+    } else {
+      $deployOutput = & $useVercelCmd deploy --prod --yes 2>&1
+    }
     $urls = ($deployOutput | Select-String -Pattern 'https://[a-zA-Z0-9-]+\.vercel\.app' -AllMatches).Matches.Value
     $deploymentUrl = $urls | Select-Object -Last 1
     if (-not $deploymentUrl) {
@@ -74,9 +92,17 @@ function Deploy-With-Vercel($projectDir, $alias) {
     }
 
     if ($alias -and $deploymentUrl) {
-      Write-Info "Mapping alias '$alias' to deployment..."
-      & $useVercelCmd alias set $deploymentUrl $alias --token $env:VERCEL_TOKEN | Out-Null
-      Write-Info "Alias mapped: https://$alias"
+      try {
+        Write-Info "Mapping alias '$alias' to deployment..."
+        if ($hasToken) {
+          & $useVercelCmd alias set $deploymentUrl $alias --token $env:VERCEL_TOKEN | Out-Null
+        } else {
+          & $useVercelCmd alias set $deploymentUrl $alias | Out-Null
+        }
+        Write-Info "Alias mapped: https://$alias"
+      } catch {
+        Write-Warning "Alias mapping failed for '$alias'. Please ensure the domain exists and your account has access."
+      }
     }
 
     return $deploymentUrl
