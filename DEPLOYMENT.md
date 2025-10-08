@@ -36,16 +36,16 @@ git push origin main
 ### Deployment trên Vercel
 
 #### Backend Deployment
-1. **Cấu hình Environment Variables trên Vercel:**
+1. **Cấu hình Environment Variables trên Vercel (không ghi giá trị thật vào repo):**
    ```
-   DATABASE_HOST=tripeasy-tripeasy.l.aivencloud.com
-   DATABASE_PORT=26083
-   DATABASE_USER=avnadmin
-   DATABASE_PASSWORD=REDACTED
-   DATABASE_NAME=tripeasy
-   SECRET_KEY=your-secret-key-here
-   GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-   CORS_ORIGINS=https://tripeasy-frontend.vercel.app,http://localhost:3000
+   DATABASE_HOST=<set-on-vercel-dashboard>
+   DATABASE_PORT=<set-on-vercel-dashboard>
+   DATABASE_USER=<set-on-vercel-dashboard>
+   DATABASE_PASSWORD=<set-on-vercel-dashboard>
+   DATABASE_NAME=<set-on-vercel-dashboard>
+   SECRET_KEY=<set-on-vercel-dashboard>
+   GOOGLE_MAPS_API_KEY=<set-on-vercel-dashboard>
+   CORS_ORIGINS=<your-frontend-domain>,http://localhost:3000
    ```
 
 2. **Deploy Backend:**

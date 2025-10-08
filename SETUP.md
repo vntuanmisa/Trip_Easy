@@ -27,17 +27,17 @@ pip install -r requirements.txt
 # Tạo file .env từ template
 cp env.example .env
 
-# Chỉnh sửa file .env với thông tin thực tế
-DATABASE_HOST=tripeasy-tripeasy.l.aivencloud.com
-DATABASE_PORT=26083
-DATABASE_USER=avnadmin
-DATABASE_PASSWORD=REDACTED
-DATABASE_NAME=tripeasy
+# Chỉnh sửa file .env với thông tin thực tế (KHÔNG commit giá trị thật)
+DATABASE_HOST=your-db-host
+DATABASE_PORT=your-db-port
+DATABASE_USER=your-db-user
+DATABASE_PASSWORD=your-db-password
+DATABASE_NAME=your-db-name
 SECRET_KEY=your-super-secret-key-here
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-CORS_ORIGINS=http://localhost:3000,https://tripeasy-frontend.vercel.app
+CORS_ORIGINS=http://localhost:3000,https://your-frontend-domain
 ```
 
 #### Khởi tạo Database
