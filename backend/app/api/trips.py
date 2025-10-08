@@ -38,20 +38,34 @@ async def create_trip(trip: TripCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=List[Trip])
 async def get_trips(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Lấy danh sách chuyến đi"""
-    trip_service = TripService(db)
-    return trip_service.get_trips(skip=skip, limit=limit)
+    try:
+        trip_service = TripService(db)
+        return trip_service.get_trips(skip=skip, limit=limit)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi khi lấy danh sách chuyến đi: {str(e)}"
+        )
 
 @router.get("/{trip_id}", response_model=TripWithDetails)
 async def get_trip(trip_id: int, db: Session = Depends(get_db)):
     """Lấy thông tin chi tiết chuyến đi"""
-    trip_service = TripService(db)
-    trip = trip_service.get_trip(trip_id)
-    if not trip:
+    try:
+        trip_service = TripService(db)
+        trip = trip_service.get_trip(trip_id)
+        if not trip:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Không tìm thấy chuyến đi"
+            )
+        return trip
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Không tìm thấy chuyến đi"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Lỗi khi lấy thông tin chuyến đi: {str(e)}"
         )
-    return trip
 
 @router.get("/invite/{invite_code}", response_model=Trip)
 async def get_trip_by_invite_code(invite_code: str, db: Session = Depends(get_db)):

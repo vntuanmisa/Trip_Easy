@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ApiError } from '../types';
 
 const runtimeDefault = (typeof window !== 'undefined' && window.location.hostname !== 'localhost')
-  ? 'https://tripeasyapi-mauve.vercel.app'
+  ? 'https://tripeasy-backend.vercel.app'
   : 'http://localhost:8000';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || runtimeDefault;
