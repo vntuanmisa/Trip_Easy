@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
@@ -43,12 +44,13 @@ ca_cert_path = temp_file.name
 engine = create_engine(
     f"mysql+pymysql://{settings.database_user}:{settings.database_password}@{settings.database_host}:{settings.database_port}/{settings.database_name}",
     pool_pre_ping=True,
-    pool_recycle=300,
+    poolclass=NullPool,  # Avoid stale pooled connections in serverless
     connect_args={
         "ssl_ca": ca_cert_path,
         "ssl_verify_cert": True,
         "ssl_verify_identity": False,  # Aiven Cloud may use different certificate identity
-        "charset": "utf8mb4"
+        "charset": "utf8mb4",
+        "connect_timeout": 10
     }
 )
 

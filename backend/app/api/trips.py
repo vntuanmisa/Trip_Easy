@@ -8,6 +8,9 @@ from ..services.trip_service import TripService
 from ..services.settlement_service import SettlementService
 import random
 import string
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -39,9 +42,16 @@ async def create_trip(trip: TripCreate, db: Session = Depends(get_db)):
 async def get_trips(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Lấy danh sách chuyến đi"""
     try:
+        logger.info(f"[get_trips] Incoming request skip={skip}, limit={limit}")
         trip_service = TripService(db)
-        return trip_service.get_trips(skip=skip, limit=limit)
+        trips = trip_service.get_trips(skip=skip, limit=limit)
+        logger.info(f"[get_trips] Retrieved {len(trips)} trips")
+        return trips
     except Exception as e:
+        logger.error(
+            f"[get_trips] Failed. skip={skip}, limit={limit}, err={e!r}, type={type(e)}"
+        )
+        logger.exception("[get_trips] Traceback:")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Lỗi khi lấy danh sách chuyến đi: {str(e)}"

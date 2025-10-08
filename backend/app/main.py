@@ -65,8 +65,10 @@ async def health_check():
     try:
         # Test basic database connection without querying specific tables
         from .core.database import SessionLocal
+        from sqlalchemy import text
+        
         db = SessionLocal()
-        result = db.execute("SELECT 1 as test").fetchone()
+        result = db.execute(text("SELECT 1 as test")).fetchone()
         db.close()
         return {
             "status": "healthy",
@@ -86,16 +88,18 @@ async def database_info():
     """Kiểm tra thông tin database và tables"""
     try:
         from .core.database import SessionLocal
+        from sqlalchemy import text
+        
         db = SessionLocal()
         
         # Check if trips table exists
-        result = db.execute("SHOW TABLES LIKE 'trips'").fetchone()
+        result = db.execute(text("SHOW TABLES LIKE 'trips'")).fetchone()
         trips_exists = result is not None
         
         tables_info = {}
         if trips_exists:
             # Get trips table structure
-            columns = db.execute("DESCRIBE trips").fetchall()
+            columns = db.execute(text("DESCRIBE trips")).fetchall()
             tables_info["trips"] = [{"name": col[0], "type": col[1], "null": col[2], "key": col[3]} for col in columns]
         
         db.close()
